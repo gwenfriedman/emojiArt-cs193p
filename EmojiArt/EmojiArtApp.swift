@@ -11,7 +11,7 @@ import SwiftUI
 @main
 struct EmojiArtApp: App {
     
-    //TODO: eventually this won't be a let
+    //eventually this won't be a let
     let document = EmojiArtDocument()
     
     var body: some Scene {

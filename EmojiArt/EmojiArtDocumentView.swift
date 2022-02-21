@@ -18,27 +18,35 @@ struct EmojiArtDocumentView: View {
         VStack(spacing: 0) {
             documentBody
             palette
-            
-            //TODO: delete button? or long press on emoji
         }
     }
-    
+        
     var documentBody: some View {
         GeometryReader { geometry in
             ZStack {
                 Color.white.overlay(
-                    //TODO: this is not filling the whole screen
                     OptionalImage(uiImage: document.backgroundImage)
                         .scaleEffect(zoomScale)
                         .position(convertFromEmojiCoordinates((0,0), in: geometry))
                 )
-                .gesture(doubleTapToZoom(in: geometry.size))
+                .gesture(doubleTapToZoom(in: geometry.size).simultaneously(with: tapToDeselect()))
                 if document.backgroundImageFetchStatus == .fetching {
                     //built into swift, loading screen
                     ProgressView().scaleEffect(2)
                 } else {
                     ForEach(document.emojis) { emoji in
                         Text(emoji.text)
+                            .onTapGesture {
+                               document.selectEmoji(emoji)
+                           }
+                            //TODO: this does not work, how to add gesture to just emoji? - make new gestures?
+                            //use moveEmoji
+//                            .gesture(document.selectedEmojis.count > 0 && emoji.isSelected ? panGesture().simultaneously(with: zoomGesture()) : nil)
+                            .gesture(document.selectedEmojis.count > 0 && emoji.isSelected ? moveEmoji(emoji) : nil)
+                            .onLongPressGesture {
+                                document.deleteEmoji(emoji)
+                                }
+                            .border(emoji.isSelected ? Color.green : Color.clear)
                             .font(.system(size: fontSize(for: emoji)))
                             .scaleEffect(zoomScale)
                             .position(position(for: emoji, in: geometry))
@@ -55,9 +63,8 @@ struct EmojiArtDocumentView: View {
                 drop(providers: providers, at: location, in: geometry)
             }
             
-            //TODO: check if emojis are scaled and if so scale only those
             //don't put more than 1 .gesture on the same view - can use exculsively instead
-            .gesture(panGesture().simultaneously(with: zoomGesture()))
+            .gesture(document.selectedEmojis.count == 0 ? panGesture().simultaneously(with: zoomGesture()) : nil)
         }
     }
     
@@ -96,7 +103,7 @@ struct EmojiArtDocumentView: View {
         convertFromEmojiCoordinates((emoji.x, emoji.y), in: geometry)
     }
     
-    //TODO: change size on pinch + zoom
+    // change size on pinch + zoom
     private func fontSize(for emoji: EmojiArtModel.Emoji) -> CGFloat {
         CGFloat(emoji.size)
     }
@@ -151,6 +158,20 @@ struct EmojiArtDocumentView: View {
             }
     }
     
+    private func tapToDeselect() -> some Gesture {
+        TapGesture(count: 1)
+            .onEnded {
+                document.deselectAll()
+            }
+    }
+    
+    private func tapToToggleSelectedEmoji(_ emoji: EmojiArtModel.Emoji) -> some Gesture {
+        TapGesture(count: 1)
+            .onEnded {
+                document.selectEmoji(emoji)
+            }
+    }
+    
     private func zoomToFit(_ image: UIImage?, in size: CGSize) {
         if let image = image, image.size.width > 0, image.size.height > 0, size.width > 0, size.height > 0  {
             let hZoom = size.width / image.size.width
@@ -159,6 +180,8 @@ struct EmojiArtDocumentView: View {
             steadyStateZoomScale = min(hZoom, vZoom)
         }
     }
+    
+    //TODO: add gesture for scaleEmoji
     
     // MARK: - Panning
     
@@ -177,6 +200,17 @@ struct EmojiArtDocumentView: View {
             .onEnded { finalDragGestureValue in
                 steadyStatePanOffset = steadyStatePanOffset + (finalDragGestureValue.translation / zoomScale)
             }
+    }
+    
+    private func moveEmoji(_ emoji: EmojiArtModel.Emoji) -> some Gesture {
+        DragGesture()
+            //TODO: use a dfferent gesture state?
+            .updating($gesturePanOffset) { latestDragGestureValue, gesturePanOffset, _ in
+                gesturePanOffset = latestDragGestureValue.translation / zoomScale
+                document.moveEmoji(emoji, by: gesturePanOffset)
+                print(gesturePanOffset)
+            }
+//            document.moveEmoji(emoji, by: size)
     }
 
     // MARK: - Palette

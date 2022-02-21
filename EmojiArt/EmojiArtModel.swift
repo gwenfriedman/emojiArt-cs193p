@@ -18,6 +18,7 @@ struct EmojiArtModel {
         var y: Int // offset from the center
         var size: Int
         let id: Int
+        var isSelected: Bool = false
         
         fileprivate init(text: String, x: Int, y: Int, size: Int, id: Int) {
             self.text = text
@@ -35,5 +36,9 @@ struct EmojiArtModel {
     mutating func addEmoji(_ text: String, at location: (x: Int, y: Int), size: Int) {
         uniqueEmojiId += 1
         emojis.append(Emoji(text: text, x: location.x, y: location.y, size: size, id: uniqueEmojiId))
+    }
+    
+    mutating func removeEmoji(_ emoji: Emoji) {
+        emojis.remove(emoji)
     }
 }

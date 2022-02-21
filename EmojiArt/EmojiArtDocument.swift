@@ -25,6 +25,7 @@ class EmojiArtDocument: ObservableObject
     
     var emojis: [EmojiArtModel.Emoji] { emojiArt.emojis }
     var background: EmojiArtModel.Background { emojiArt.background }
+    var selectedEmojis: [EmojiArtModel.Emoji] { emojiArt.emojis.filter {$0.isSelected} }
     
     // MARK: - Background
     
@@ -82,6 +83,22 @@ class EmojiArtDocument: ObservableObject
     func scaleEmoji(_ emoji: EmojiArtModel.Emoji, by scale: CGFloat) {
         if let index = emojiArt.emojis.index(matching: emoji) {
             emojiArt.emojis[index].size = Int((CGFloat(emojiArt.emojis[index].size) * scale).rounded(.toNearestOrAwayFromZero))
+        }
+    }
+    
+    func selectEmoji(_ emoji: EmojiArtModel.Emoji) {
+        if let index = emojiArt.emojis.index(matching: emoji) {
+            emojiArt.emojis[index].isSelected = !emojiArt.emojis[index].isSelected
+        }
+    }
+    
+    func deleteEmoji(_ emoji: EmojiArtModel.Emoji) {
+        emojiArt.removeEmoji()
+    }
+    
+    func deselectAll() {
+        for (index, e) in emojiArt.emojis.enumerated() {
+            emojiArt.emojis[index].isSelected = false
         }
     }
 }
