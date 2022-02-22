@@ -39,7 +39,8 @@ struct EmojiArtDocumentView: View {
                             .onTapGesture {
                                document.selectEmoji(emoji)
                            }
-                            .gesture(document.selectedEmojis.count > 0 ? moveSelectedEmojis().simultaneously(with: zoomSelectedEmojis()) : nil)
+                            .gesture(moveSelectedEmojis())
+
                             .onLongPressGesture {
                                 document.deleteEmoji(emoji)
                                 }
@@ -61,7 +62,8 @@ struct EmojiArtDocumentView: View {
             }
             
             //don't put more than 1 .gesture on the same view - can use exculsively instead
-            .gesture(document.selectedEmojis.count == 0 ? panGesture().simultaneously(with: zoomGesture()) : nil)
+            .gesture(document.selectedEmojis.count == 0 ? panGesture() : nil)
+            .gesture(zoomGesture())
         }
     }
     
@@ -128,7 +130,6 @@ struct EmojiArtDocumentView: View {
     //only exists while the gesture is happening
     @GestureState private var gestureZoomScale: CGFloat = 1
     
-    @State private var steadyStateSelectedEmojisZoomScale: CGFloat = 1
     @GestureState private var gestureSelectedEmojiZoomScale: CGFloat = 1
     
     private var zoomScale: CGFloat {
@@ -138,26 +139,19 @@ struct EmojiArtDocumentView: View {
     private func zoomGesture() -> some Gesture {
         //the change in the distance * the zoom scale
         MagnificationGesture()
-                        
-            //the name of the gestureState you are tracking
-            //gestureZoomScale is an in out, not the same as above gestureZoomScale
-            .updating($gestureZoomScale) { latestGestureScale, gestureZoomScale, _ in
-                gestureZoomScale = latestGestureScale
-            }
-            .onEnded { gestureScaleAtEnd in
-                steadyStateZoomScale *= gestureScaleAtEnd
-            }
-    }
-    
-    private func zoomSelectedEmojis() -> some Gesture {
-        MagnificationGesture()
-            .updating($gestureZoomScale) { latestGestureScale, gestureZoomScale, _ in
-                gestureZoomScale = latestGestureScale
-            }
+            
+            .updating(document.selectedEmojis.isEmpty ? $gestureZoomScale : $gestureSelectedEmojiZoomScale) { latestGestureScale, gestureZoomScale, transaction in
+                            gestureZoomScale = latestGestureScale
+                
+                            if !document.selectedEmojis.isEmpty {
+                                document.selectedEmojis.forEach { (emoji) in
+                                    document.scaleEmoji(emoji, by: latestGestureScale)
+                                }
+                            }
+                        }
             .onEnded { finalGestureScale in
-                steadyStateSelectedEmojisZoomScale *= finalGestureScale
-                for e in document.selectedEmojis {
-                    document.scaleEmoji(e, by: finalGestureScale)
+                if document.selectedEmojis.isEmpty {
+                    steadyStateZoomScale *= finalGestureScale
                 }
             }
     }
