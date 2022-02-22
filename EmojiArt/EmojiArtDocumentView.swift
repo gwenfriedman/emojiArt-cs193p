@@ -39,10 +39,7 @@ struct EmojiArtDocumentView: View {
                             .onTapGesture {
                                document.selectEmoji(emoji)
                            }
-                            //TODO: this does not work, how to add gesture to just emoji? - make new gestures?
-                            //use moveEmoji
-//                            .gesture(document.selectedEmojis.count > 0 && emoji.isSelected ? panGesture().simultaneously(with: zoomGesture()) : nil)
-                            .gesture(document.selectedEmojis.count > 0 && emoji.isSelected ? moveEmoji(emoji) : nil)
+                            .gesture(document.selectedEmojis.count > 0 ? moveSelectedEmojis().simultaneously(with: zoomSelectedEmojis()) : nil)
                             .onLongPressGesture {
                                 document.deleteEmoji(emoji)
                                 }
@@ -131,6 +128,9 @@ struct EmojiArtDocumentView: View {
     //only exists while the gesture is happening
     @GestureState private var gestureZoomScale: CGFloat = 1
     
+    @State private var steadyStateSelectedEmojisZoomScale: CGFloat = 1
+    @GestureState private var gestureSelectedEmojiZoomScale: CGFloat = 1
+    
     private var zoomScale: CGFloat {
         steadyStateZoomScale * gestureZoomScale
     }
@@ -146,6 +146,19 @@ struct EmojiArtDocumentView: View {
             }
             .onEnded { gestureScaleAtEnd in
                 steadyStateZoomScale *= gestureScaleAtEnd
+            }
+    }
+    
+    private func zoomSelectedEmojis() -> some Gesture {
+        MagnificationGesture()
+            .updating($gestureZoomScale) { latestGestureScale, gestureZoomScale, _ in
+                gestureZoomScale = latestGestureScale
+            }
+            .onEnded { finalGestureScale in
+                steadyStateSelectedEmojisZoomScale *= finalGestureScale
+                for e in document.selectedEmojis {
+                    document.scaleEmoji(e, by: finalGestureScale)
+                }
             }
     }
     
@@ -181,12 +194,12 @@ struct EmojiArtDocumentView: View {
         }
     }
     
-    //TODO: add gesture for scaleEmoji
-    
     // MARK: - Panning
     
     @State private var steadyStatePanOffset: CGSize = CGSize.zero
     @GestureState private var gesturePanOffset: CGSize = CGSize.zero
+    
+    @GestureState private var gestureStateSelectedEmojiOffset: CGSize = .zero
     
     private var panOffset: CGSize {
         (steadyStatePanOffset + gesturePanOffset) * zoomScale
@@ -202,15 +215,14 @@ struct EmojiArtDocumentView: View {
             }
     }
     
-    private func moveEmoji(_ emoji: EmojiArtModel.Emoji) -> some Gesture {
+    private func moveSelectedEmojis() -> some Gesture {
         DragGesture()
-            //TODO: use a dfferent gesture state?
-            .updating($gesturePanOffset) { latestDragGestureValue, gesturePanOffset, _ in
-                gesturePanOffset = latestDragGestureValue.translation / zoomScale
-                document.moveEmoji(emoji, by: gesturePanOffset)
-                print(gesturePanOffset)
+            .updating($gestureStateSelectedEmojiOffset) { latestDragGestureValue, gestureStateSelectedEmojiOffset, _ in
+                gestureStateSelectedEmojiOffset = latestDragGestureValue.translation / zoomScale
+                for e in document.selectedEmojis {
+                    document.moveEmoji(e, by: gestureStateSelectedEmojiOffset)
+                }
             }
-//            document.moveEmoji(emoji, by: size)
     }
 
     // MARK: - Palette
