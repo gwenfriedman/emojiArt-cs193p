@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0638079D27C9359300C0E149 /* PaletteChooser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0638079C27C9359300C0E149 /* PaletteChooser.swift */; };
+		0638079F27C93E8A00C0E149 /* PaletteEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0638079E27C93E8A00C0E149 /* PaletteEditor.swift */; };
+		063807A127C94AE400C0E149 /* PaletteManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 063807A027C94AE400C0E149 /* PaletteManager.swift */; };
 		063D00D027C559B300D6EAE8 /* PaletteStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 063D00CF27C559B300D6EAE8 /* PaletteStore.swift */; };
 		EC030741263771AD001E9F47 /* EmojiArtApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC030740263771AD001E9F47 /* EmojiArtApp.swift */; };
 		EC030743263771AD001E9F47 /* EmojiArtDocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC030742263771AD001E9F47 /* EmojiArtDocumentView.swift */; };
@@ -20,6 +23,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0638079C27C9359300C0E149 /* PaletteChooser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteChooser.swift; sourceTree = "<group>"; };
+		0638079E27C93E8A00C0E149 /* PaletteEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteEditor.swift; sourceTree = "<group>"; };
+		063807A027C94AE400C0E149 /* PaletteManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteManager.swift; sourceTree = SOURCE_ROOT; };
 		063D00CF27C559B300D6EAE8 /* PaletteStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteStore.swift; sourceTree = "<group>"; };
 		EC03073D263771AD001E9F47 /* EmojiArt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EmojiArt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC030740263771AD001E9F47 /* EmojiArtApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiArtApp.swift; sourceTree = "<group>"; };
@@ -64,8 +70,11 @@
 		EC03073F263771AD001E9F47 /* EmojiArt */ = {
 			isa = PBXGroup;
 			children = (
+				063807A027C94AE400C0E149 /* PaletteManager.swift */,
 				063D00CF27C559B300D6EAE8 /* PaletteStore.swift */,
 				EC030742263771AD001E9F47 /* EmojiArtDocumentView.swift */,
+				0638079E27C93E8A00C0E149 /* PaletteEditor.swift */,
+				0638079C27C9359300C0E149 /* PaletteChooser.swift */,
 				EC030753263772D8001E9F47 /* EmojiArtDocument.swift */,
 				EC03074F263771AD001E9F47 /* EmojiArtModel.swift */,
 				EC030751263771D0001E9F47 /* EmojiArtModel.Background.swift */,
@@ -157,13 +166,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				EC030758263774A2001E9F47 /* UtilityViews.swift in Sources */,
+				063807A127C94AE400C0E149 /* PaletteManager.swift in Sources */,
 				063D00D027C559B300D6EAE8 /* PaletteStore.swift in Sources */,
+				0638079F27C93E8A00C0E149 /* PaletteEditor.swift in Sources */,
 				EC030743263771AD001E9F47 /* EmojiArtDocumentView.swift in Sources */,
 				EC030741263771AD001E9F47 /* EmojiArtApp.swift in Sources */,
 				EC030757263774A2001E9F47 /* UtilityExtensions.swift in Sources */,
 				EC030754263772D8001E9F47 /* EmojiArtDocument.swift in Sources */,
 				EC030750263771AD001E9F47 /* EmojiArtModel.swift in Sources */,
 				EC030752263771D0001E9F47 /* EmojiArtModel.Background.swift in Sources */,
+				0638079D27C9359300C0E149 /* PaletteChooser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -293,7 +305,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"EmojiArt/Preview Content\"";
-				DEVELOPMENT_TEAM = DJ26AU4A57;
+				DEVELOPMENT_TEAM = AUM9368RBU;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = EmojiArt/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -301,7 +313,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = edu.stanford.cs193p.instructor.EmojiArt;
+				PRODUCT_BUNDLE_IDENTIFIER = cs193p.EmojiArt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -315,7 +327,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"EmojiArt/Preview Content\"";
-				DEVELOPMENT_TEAM = DJ26AU4A57;
+				DEVELOPMENT_TEAM = AUM9368RBU;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = EmojiArt/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -323,7 +335,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = edu.stanford.cs193p.instructor.EmojiArt;
+				PRODUCT_BUNDLE_IDENTIFIER = cs193p.EmojiArt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
