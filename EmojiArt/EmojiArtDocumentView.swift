@@ -78,6 +78,11 @@ struct EmojiArtDocumentView: View {
                     break
                 }
             }
+            //fit image to screen size when added
+            //$document.backgroundImage would be a binding - which is not what we need here
+            .onReceive(document.$backgroundImage) { image in
+                zoomToFit(image, in: geometry.size)
+            }
         }
     }
     

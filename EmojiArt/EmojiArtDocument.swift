@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Combine
 
 //View model
 class EmojiArtDocument: ObservableObject
@@ -50,7 +51,6 @@ class EmojiArtDocument: ObservableObject
         do {
             //get data
             let data: Data = try emojiArt.json()
-            print("\(thisFunction) json = \(String(data: data, encoding: .utf8) ?? nil)")
             //write to URL
             try data.write(to: url)
             print("\(thisFunction) success!")
@@ -82,6 +82,8 @@ class EmojiArtDocument: ObservableObject
     @Published var backgroundImage: UIImage?
     @Published var backgroundImageFetchStatus = BackgroundImageFetchStatus.idle
     
+    private var backgroundImageDataCancellable: AnyCancellable?
+    
     //need to mark equatable because of associated data
     enum BackgroundImageFetchStatus: Equatable {
         case idle
@@ -95,22 +97,38 @@ class EmojiArtDocument: ObservableObject
         case .url(let url):
             // fetch the url
             backgroundImageFetchStatus = .fetching
-            DispatchQueue.global(qos: .userInitiated).async {
-                let imageData = try? Data(contentsOf: url)
-                
-                //weak does not force self to be kept in the heap
-                DispatchQueue.main.async { [weak self] in
-                    if self?.emojiArt.background == EmojiArtModel.Background.url(url) {
-                        self?.backgroundImageFetchStatus = .idle
-                        if imageData != nil {
-                            self?.backgroundImage = UIImage(data: imageData!)
-                        }
-                        if self?.backgroundImage == nil {
-                            self?.backgroundImageFetchStatus = .failed(url)
-                        }
-                    }
+            backgroundImageDataCancellable?.cancel()
+            
+            //publisher based solution
+            let session = URLSession.shared
+            //publisher of UIImage optionals
+            let publisher = session.dataTaskPublisher(for: url)
+                .map { (data, urlResponse) in UIImage(data: data) }
+                .replaceError(with: nil)
+                .receive(on: DispatchQueue.main)
+            
+            backgroundImageDataCancellable = publisher
+                .sink { [weak self] image in
+                    self?.backgroundImage = image
+                    self?.backgroundImageFetchStatus = (image != nil) ? .idle : .failed(url)
                 }
-            }
+        
+//            DispatchQueue.global(qos: .userInitiated).async {
+//                let imageData = try? Data(contentsOf: url)
+//
+//                //weak does not force self to be kept in the heap
+//                DispatchQueue.main.async { [weak self] in
+//                    if self?.emojiArt.background == EmojiArtModel.Background.url(url) {
+//                        self?.backgroundImageFetchStatus = .idle
+//                        if imageData != nil {
+//                            self?.backgroundImage = UIImage(data: imageData!)
+//                        }
+//                        if self?.backgroundImage == nil {
+//                            self?.backgroundImageFetchStatus = .failed(url)
+//                        }
+//                    }
+//                }
+//            }
         case .imageData(let data):
             backgroundImage = UIImage(data: data)
         case .blank:
